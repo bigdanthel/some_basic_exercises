@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Border-Radius Previewer</title>
+    <style>
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #1a1d23;
+    --surface: #23272f;
+    --surface-alt: #2c313a;
+    --text-primary: #e8eaed;
+    --text-secondary: #9aa0a6;
+    --accent: #3498db;
+    --accent-hover: #2980b9;
+    --accent-success: #27ae60;
+    --border: #3a3f4b;
+    --focus-ring: 3px solid #5cadef;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    font-size: 16px;
+}
+
+html, body {
+    min-height: 100%;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+header {
+    text-align: center;
+    padding: 2rem 1rem 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+}
+
+header p {
+    margin-top: 0.35rem;
+    font-size: 0.925rem;
+    color: var(--text-secondary);
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+    width: 100%;
+    flex: 1;
+}
+
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Preview Section ── */
+
+.preview-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.preview-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    min-height: 340px;
+    overflow: hidden;
+}
+
+#preview-box {
+    background-color: #3498db;
+    transition: background-color 0.2s ease, border-radius 0.05s linear, width 0.2s ease, height 0.2s ease;
+    will-change: border-radius;
+    width: 300px;
+    height: 300px;
+    border-radius: 0px;
+    flex-shrink: 0;
+}
+
+/* ── Settings Panel ── */
+
+.settings-panel {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+}
+
+.settings-panel summary {
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    margin-bottom: 0.75rem;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    user-select: none;
+}
+
+.settings-panel summary::-webkit-details-marker {
+    display: none;
+}
+
+.settings-panel summary::before {
+    content: '▸';
+    font-size: 0.75rem;
+    transition: transform 0.2s;
+}
+
+.settings-panel[open] summary::before {
+    transform: rotate(90deg);
+}
+
+.settings-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+}
+
+.settings-group:last-child {
+    margin-bottom: 0;
+}
+
+.settings-group label {
+    flex: 0 0 48px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.settings-input-row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.settings-input-row input[type="range"] {
+    flex: 1;
+}
+
+.settings-input-row input[type="number"] {
+    width: 72px;
+}
+
+/* ── Controls Section ── */
+
+.controls-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.global-settings {
+    display: flex;
+    gap: 1rem;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+}
+
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1;
+}
+
+.setting-item label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* Custom select */
+#unit-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--surface-alt);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 0.45rem 2rem 0.45rem 0.65rem;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23e8eaed' viewBox='0 0 16 16'%3E%3Cpath d='M8 10.5l-5-5 1.41-1.41L8 7.67l3.59-3.58L11 5.5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center;
+    min-width: 80px;
+}
+
+#unit-select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: var(--focus-ring);
+}
+
+/* Custom color picker */
+#color-picker {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 40px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-alt);
+    cursor: pointer;
+    padding: 4px;
+}
+
+#color-picker::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+#color-picker::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+#color-picker:focus {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-color: var(--accent);
+}
+
+/* ── Corner Controls ── */
+
+.corner-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+@media (max-width: 480px) {
+    .corner-controls {
+        grid-template-columns: 1fr;
+    }
+}
+
+.corner-group {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
+}
+
+.corner-label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+}
+
+.corner-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+/* ── Range Slider ── */
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: var(--surface-alt);
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: var(--accent);
+    border: 2px solid var(--surface);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: var(--accent);
+    border: 2px solid var(--surface);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    cursor: pointer;
+}
+
+input[type="range"]:focus {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: 999px;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+    background-color: var(--accent-hover);
+}
+
+/* ── Number Input ── */
+
+.corner-number,
+.settings-input-row input[type="number"] {
+    -moz-appearance: textfield;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: var(--surface-alt);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 0.3rem 0.5rem;
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-size: 0.95rem;
+    font-family: inherit;
+    width: 72px;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.corner-number:focus,
+.settings-input-row input[type="number"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: var(--focus-ring);
+}
+
+/* ── Toggle Switch ── */
+
+.advanced-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.toggle-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-switch input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background-color: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.toggle-slider::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background-color: var(--text-secondary);
+    border-radius: 50%;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.toggle-switch input:checked + .toggle-slider::after {
+    transform: translateX(20px);
+    background-color: #fff;
+}
+
+.toggle-switch input:focus + .toggle-slider {
+    box-shadow: var(--focus-ring);
+}
+
+.toggle-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* ── Advanced Panel ── */
+
+.advanced-panel {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+}
+
+.advanced-panel h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.panel-note {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.advanced-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+@media (max-width: 480px) {
+    .advanced-group {
+        grid-template-columns: 1fr;
+    }
+}
+
+.advanced-corner-group {
+    background-color: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* ── Output Section ── */
+
+.output-section {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+    background-color: var(--surface);
+}
+
+.output-group {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.output-group > label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+}
+
+.output-code-wrapper {
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+}
+
+.output-code {
+    display: block;
+    background-color: #0d1117;
+    color: #79c0ff;
+    font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.copy-btn {
+    background-color: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 0.55rem 1.25rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.copy-btn:hover {
+    background-color: var(--accent-hover);
+}
+
+.copy-btn:focus {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.copy-btn.copied {
+    background-color: var(--accent-success);
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Border-Radius Previewer</h1>
+        <p>Interactive CSS border-radius generator — adjust each corner in real time</p>
+    </header>
+
+    <div class="container">
+        <section class="preview-section">
+            <div class="preview-wrapper">
+                <div id="preview-box"></div>
+            </div>
+            <details open class="settings-panel">
+                <summary>Preview Box Settings</summary>
+                <div class="settings-group">
+                    <label for="preview-width">Width</label>
+                    <div class="settings-input-row">
+                        <input type="range" id="preview-width-slider" min="50" max="600" value="300">
+                        <input type="number" id="preview-width" min="50" max="600" value="300">
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <label for="preview-height">Height</label>
+                    <div class="settings-input-row">
+                        <input type="range" id="preview-height-slider" min="50" max="600" value="300">
+                        <input type="number" id="preview-height" min="50" max="600" value="300">
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <section class="controls-section">
+            <div class="global-settings">
+                <div class="setting-item">
+                    <label for="unit-select">Unit</label>
+                    <select id="unit-select">
+                        <option value="px" selected>px</option>
+                        <option value="%">%</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="color-picker">Color</label>
+                    <input type="color" id="color-picker" value="#3498db">
+                </div>
+            </div>
+
+            <div class="corner-controls" id="corner-controls">
+                <div class="corner-group" data-corner="tl">
+                    <span class="corner-label">Top-Left</span>
+                    <div class="corner-inputs">
+                        <input type="range" class="corner-slider" id="tl-slider" min="0" max="150" value="0" aria-label="Top-Left border-radius slider">
+                        <input type="number" class="corner-number" id="tl-number" min="0" max="150" value="0" aria-label="Top-Left border-radius number">
+                    </div>
+                </div>
+                <div class="corner-group" data-corner="tr">
+                    <span class="corner-label">Top-Right</span>
+                    <div class="corner-inputs">
+                        <input type="range" class="corner-slider" id="tr-slider" min="0" max="150" value="0" aria-label="Top-Right border-radius slider">
+                        <input type="number" class="corner-number" id="tr-number" min="0" max="150" value="0" aria-label="Top-Right border-radius number">
+                    </div>
+                </div>
+                <div class="corner-group" data-corner="br">
+                    <span class="corner-label">Bottom-Right</span>
+                    <div class="corner-inputs">
+                        <input type="range" class="corner-slider" id="br-slider" min="0" max="150" value="0" aria-label="Bottom-Right border-radius slider">
+                        <input type="number" class="corner-number" id="br-number" min="0" max="150" value="0" aria-label="Bottom-Right border-radius number">
+                    </div>
+                </div>
+                <div class="corner-group" data-corner="bl">
+                    <span class="corner-label">Bottom-Left</span>
+                    <div class="corner-inputs">
+                        <input type="range" class="corner-slider" id="bl-slider" min="0" max="150" value="0" aria-label="Bottom-Left border-radius slider">
+                        <input type="number" class="corner-number" id="bl-number" min="0" max="150" value="0" aria-label="Bottom-Left border-radius number">
+                    </div>
+                </div>
+            </div>
+
+            <div class="advanced-toggle">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="advanced-toggle">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Advanced Mode (8-Value)</span>
+                </label>
+            </div>
+
+            <div class="advanced-panel" id="advanced-panel" hidden>
+                <h3>Advanced Controls</h3>
+                <p class="panel-note">Set separate horizontal and vertical radii for each corner.</p>
+                <div class="advanced-group">
+                    <div class="advanced-corner-group" data-corner="tl-v">
+                        <span class="corner-label">Top-Left Vertical</span>
+                        <div class="corner-inputs">
+                            <input type="range" class="corner-slider" id="tl-v-slider" min="0" max="150" value="0" aria-label="Top-Left vertical border-radius slider">
+                            <input type="number" class="corner-number" id="tl-v-number" min="0" max="150" value="0" aria-label="Top-Left vertical border-radius number">
+                        </div>
+                    </div>
+                    <div class="advanced-corner-group" data-corner="tr-v">
+                        <span class="corner-label">Top-Right Vertical</span>
+                        <div class="corner-inputs">
+                            <input type="range" class="corner-slider" id="tr-v-slider" min="0" max="150" value="0" aria-label="Top-Right vertical border-radius slider">
+                            <input type="number" class="corner-number" id="tr-v-number" min="0" max="150" value="0" aria-label="Top-Right vertical border-radius number">
+                        </div>
+                    </div>
+                    <div class="advanced-corner-group" data-corner="br-v">
+                        <span class="corner-label">Bottom-Right Vertical</span>
+                        <div class="corner-inputs">
+                            <input type="range" class="corner-slider" id="br-v-slider" min="0" max="150" value="0" aria-label="Bottom-Right vertical border-radius slider">
+                            <input type="number" class="corner-number" id="br-v-number" min="0" max="150" value="0" aria-label="Bottom-Right vertical border-radius number">
+                        </div>
+                    </div>
+                    <div class="advanced-corner-group" data-corner="bl-v">
+                        <span class="corner-label">Bottom-Left Vertical</span>
+                        <div class="corner-inputs">
+                            <input type="range" class="corner-slider" id="bl-v-slider" min="0" max="150" value="0" aria-label="Bottom-Left vertical border-radius slider">
+                            <input type="number" class="corner-number" id="bl-v-number" min="0" max="150" value="0" aria-label="Bottom-Left vertical border-radius number">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="output-section">
+        <div class="output-group">
+            <label for="css-output">Generated CSS</label>
+            <div class="output-code-wrapper">
+                <code id="css-output" class="output-code" readonly></code>
+            </div>
+            <button id="copy-btn" class="copy-btn">Copy to Clipboard</button>
+        </div>
+    </footer>
+
+    <script>
+(function () {
+    'use strict';
+
+    const state = {
+        unit: 'px',
+        tl: 0, tr: 0, br: 0, bl: 0,
+        tlV: 0, trV: 0, brV: 0, blV: 0,
+        color: '#3498db',
+        width: 300,
+        height: 300,
+        advanced: false,
+    };
+
+    const MAX_PX = 150;
+    const MAX_PCT = 50;
+
+    function debounce(fn, delay) {
+        let timer;
+        return function () {
+            const args = arguments;
+            clearTimeout(timer);
+            timer = setTimeout(function () { fn.apply(null, args); }, delay);
+        };
+    }
+
+    var previewBox     = document.getElementById('preview-box');
+    var unitSelect     = document.getElementById('unit-select');
+    var colorPicker    = document.getElementById('color-picker');
+    var copyBtn        = document.getElementById('copy-btn');
+    var cssOutput      = document.getElementById('css-output');
+    var advancedToggle = document.getElementById('advanced-toggle');
+    var advancedPanel  = document.getElementById('advanced-panel');
+    var widthSlider    = document.getElementById('preview-width-slider');
+    var widthInput     = document.getElementById('preview-width');
+    var heightSlider   = document.getElementById('preview-height-slider');
+    var heightInput    = document.getElementById('preview-height');
+
+    var corners = ['tl', 'tr', 'br', 'bl'];
+
+    function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+
+    function sanitizeNumber(str) {
+        var parsed = parseFloat(str);
+        return isNaN(parsed) ? 0 : Math.round(parsed);
+    }
+
+    function getMax() { return state.unit === 'px' ? MAX_PX : MAX_PCT; }
+
+    function setControlsRange(key, max) {
+        var slider = document.getElementById(key + '-slider');
+        var number = document.getElementById(key + '-number');
+        if (slider) slider.max = max;
+        if (number) number.max = max;
+    }
+
+    function updateSliderFromState() {
+        corners.forEach(function (c) {
+            var slider = document.getElementById(c + '-slider');
+            var number = document.getElementById(c + '-number');
+            if (slider) slider.value = state[c];
+            if (number) number.value = state[c];
+        });
+        if (state.advanced) {
+            corners.forEach(function (c) {
+                var sliderV = document.getElementById(c + '-v-slider');
+                var numberV = document.getElementById(c + '-v-number');
+                var vKey = c + 'V';
+                if (sliderV) sliderV.value = state[vKey];
+                if (numberV) numberV.value = state[vKey];
+            });
+        }
+    }
+
+    function rebuildSliders(max) {
+        corners.forEach(function (c) {
+            setControlsRange(c, max);
+            setControlsRange(c + '-v', max);
+        });
+        updateSliderFromState();
+    }
+
+    function buildCssString() {
+        var u = state.unit;
+        var prefix = function (v) { return v + u; };
+        if (state.advanced) {
+            var h = prefix(state.tl) + ' ' + prefix(state.tr) + ' ' + prefix(state.br) + ' ' + prefix(state.bl);
+            var v = prefix(state.tlV) + ' ' + prefix(state.trV) + ' ' + prefix(state.brV) + ' ' + prefix(state.blV);
+            return 'border-radius: ' + h + ' / ' + v + ';';
+        }
+        var vals = prefix(state.tl) + ' ' + prefix(state.tr) + ' ' + prefix(state.br) + ' ' + prefix(state.bl);
+        return 'border-radius: ' + vals + ';';
+    }
+
+    var rafPending = false;
+
+    function updateUi() {
+        if (rafPending) return;
+        rafPending = true;
+        requestAnimationFrame(function () {
+            rafPending = false;
+            var css = buildCssString();
+            cssOutput.textContent = css;
+            previewBox.style.borderRadius = state.advanced
+                ? state.tl + state.unit + ' ' + state.tr + state.unit + ' ' + state.br + state.unit + ' ' + state.bl + state.unit + ' / '
+                    + state.tlV + state.unit + ' ' + state.trV + state.unit + ' ' + state.brV + state.unit + ' ' + state.blV + state.unit
+                : state.tl + state.unit + ' ' + state.tr + state.unit + ' ' + state.br + state.unit + ' ' + state.bl + state.unit;
+        });
+    }
+
+    function updatePreviewBoxStyle() {
+        previewBox.style.backgroundColor = state.color;
+        previewBox.style.width = state.width + 'px';
+        previewBox.style.height = state.height + 'px';
+    }
+
+    unitSelect.addEventListener('change', function () {
+        var prevMax = state.unit === 'px' ? MAX_PX : MAX_PCT;
+        state.unit = unitSelect.value;
+        var newMax = getMax();
+        var ratio = newMax / prevMax;
+        corners.forEach(function (c) {
+            state[c] = clamp(Math.round(state[c] * ratio), 0, newMax);
+        });
+        if (state.advanced) {
+            corners.forEach(function (c) {
+                var vKey = c + 'V';
+                state[vKey] = clamp(Math.round(state[vKey] * ratio), 0, newMax);
+            });
+        }
+        rebuildSliders(newMax);
+        updateUi();
+    });
+
+    colorPicker.addEventListener('input', function () {
+        state.color = colorPicker.value;
+        updatePreviewBoxStyle();
+    });
+
+    function syncSizeControls(dir, val) {
+        var sl  = dir === 'width' ? widthSlider  : heightSlider;
+        var inp = dir === 'width' ? widthInput   : heightInput;
+        state[dir] = val;
+        if (sl)  sl.value  = val;
+        if (inp) inp.value = val;
+        updatePreviewBoxStyle();
+    }
+
+    widthSlider.addEventListener('input',  function () { syncSizeControls('width',  +widthSlider.value); });
+    widthInput.addEventListener('input',   function () { syncSizeControls('width',  clamp(sanitizeNumber(widthInput.value),  50, 600)); });
+    heightSlider.addEventListener('input', function () { syncSizeControls('height', +heightSlider.value); });
+    heightInput.addEventListener('input',  function () { syncSizeControls('height', clamp(sanitizeNumber(heightInput.value), 50, 600)); });
+
+    function bindCornerControl(c, isVertical) {
+        var suffix = isVertical ? '-v' : '';
+        var slider = document.getElementById(c + suffix + '-slider');
+        var number = document.getElementById(c + suffix + '-number');
+        var key = c + (isVertical ? 'V' : '');
+
+        if (slider) {
+            slider.addEventListener('input', function () {
+                state[key] = +slider.value;
+                if (number) number.value = state[key];
+                updateUi();
+            });
+        }
+        if (number) {
+            number.addEventListener('input', debounce(function () {
+                var val = clamp(sanitizeNumber(number.value), 0, getMax());
+                state[key] = val;
+                if (slider) slider.value = val;
+                number.value = val;
+                updateUi();
+            }, 150));
+        }
+    }
+
+    corners.forEach(function (c) {
+        bindCornerControl(c, false);
+        bindCornerControl(c, true);
+    });
+
+    advancedToggle.addEventListener('change', function () {
+        state.advanced = advancedToggle.checked;
+        advancedPanel.hidden = !state.advanced;
+        if (state.advanced) {
+            corners.forEach(function (c) {
+                state[c + 'V'] = state[c];
+            });
+            updateSliderFromState();
+        }
+        updateUi();
+    });
+
+    copyBtn.addEventListener('click', function () {
+        var css = buildCssString();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(css).then(function () {
+                showCopied();
+            }).catch(function () { fallbackCopy(css); });
+        } else {
+            fallbackCopy(css);
+        }
+    });
+
+    function showCopied() {
+        copyBtn.textContent = 'Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(function () {
+            copyBtn.textContent = 'Copy to Clipboard';
+            copyBtn.classList.remove('copied');
+        }, 1800);
+    }
+
+    function fallbackCopy(text) {
+        try {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            ta.setSelectionRange(0, ta.value.length);
+            var ok = document.execCommand('copy');
+            document.body.removeChild(ta);
+            if (ok) showCopied();
+        } catch (e) {
+            copyBtn.textContent = 'Copy failed';
+            setTimeout(function () { copyBtn.textContent = 'Copy to Clipboard'; }, 1800);
+        }
+    }
+
+    updatePreviewBoxStyle();
+    updateUi();
+})();
+    </script>
+</body>
+</html>
